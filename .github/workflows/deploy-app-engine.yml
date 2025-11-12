@@ -29,8 +29,8 @@ jobs:
 
       - name: run unit test
         run: |
-          python -m unittest discover -s tests
-
+          pip install pytest
+          pytest --maxfail=1 --disable-warnings -q
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
