@@ -27,30 +27,26 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # ✅ Ensure main.py can be imported by tests
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
 
-      # ✅ Run your tests
       - name: Run unit tests
         run: |
           pip install pytest
           pytest --maxfail=1 --disable-warnings -q
 
-      # ✅ Authenticate to Google Cloud
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GAE_SA_KEY }}
 
-      # ✅ Clear environment variables that confuse gcloud
-      - name: Clean up virtual environment variables
+      # ✅ Tell gcloud to use the correct Python
+      - name: Force gcloud to use system Python
         run: |
-          unset VIRTUAL_ENV || true
-          unset PYTHONHOME || true
-          unset PYTHONPATH || true
+          which python
+          export CLOUDSDK_PYTHON=$(which python)
+          echo "CLOUDSDK_PYTHON=$(which python)" >> $GITHUB_ENV
 
-      # ✅ Deploy only if previous steps passed
       - name: Deploy to App Engine
         if: success()
         run: |
